@@ -9,10 +9,14 @@ public class InstructionText : MonoBehaviour
     public float changeInterval = 2f; // 指示が変わる間隔（秒）
 
     private string[] instructions = { //指示文を格納した配列
-        "Right up",
-        "Left up",
-        "Right down",
-        "Left down"
+        "右上げて",
+        "左上げて",
+        "右下げて",
+        "左下げて",
+        "右上げないで",
+        "左上げないで",
+        "右下げないで",
+        "左下げないで",
     };
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -35,28 +39,28 @@ public class InstructionText : MonoBehaviour
 
     void checkflag()
     {
-        if (currentInstruction == "Right up")
+        if (currentInstruction == "右上げて")
         {
             if (raiseScript.isRaisedR)
                 check.text = "true";
             else
                 check.text = "false";
         }
-        if (currentInstruction == "Right down")
+        if (currentInstruction == "右下げて")
         {
             if (!raiseScript.isRaisedR)
                 check.text = "true";
             else
                 check.text = "false";
         }
-        if (currentInstruction == "Left up")
+        if (currentInstruction == "左上げて")
         {
             if (raiseScript.isRaisedL)
                 check.text = "true";
             else
                 check.text = "false";
         }
-        if (currentInstruction == "Left down")
+        if (currentInstruction == "左下げて")
         {
             if (!raiseScript.isRaisedL)
                 check.text = "true";
