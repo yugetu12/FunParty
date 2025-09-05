@@ -1,35 +1,32 @@
 using UnityEngine;
 using UnityEngine.UI;
+
 public class InstructionText : MonoBehaviour
 {
     public Raise raiseScript;      // Raise スクリプトの参照
     public Text instructionText;   // 指示を表示するUI Text
-    public Text check; // 正誤
+    public Text check;             // 正誤表示用
+    public Text resultText;        // GameClear表示用（新しく追加する）
+
     public string currentInstruction;
     public float changeInterval = 2f; // 指示が変わる間隔（秒）
 
-    private string[] instructions = { //指示文を格納した配列
+    private int successCount = 0;      // true の回数
+    public int clearThreshold = 5;     // クリア条件（例: 5回trueになったらクリア）
+
+    private string[] instructions = {
         "右上げて",
         "左上げて",
         "右下げて",
         "左下げて",
-        "右上げないで",
-        "左上げないで",
-        "右下げないで",
-        "左下げないで",
     };
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
         InvokeRepeating("ShowRandomInstruction", 0f, changeInterval);
-        InvokeRepeating("checkflag", changeInterval, changeInterval); //0fからはじめ、changeIntaervalの間隔でShowRandomInstructionを繰り返す
+        InvokeRepeating("checkflag", changeInterval, changeInterval);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
     void ShowRandomInstruction()
     {
         int randIndex = Random.Range(0, instructions.Length);
@@ -39,36 +36,35 @@ public class InstructionText : MonoBehaviour
 
     void checkflag()
     {
+        if (resultText == null) Debug.LogError("resultText が割り当てられていません！"); 
+        bool isCorrect = false;
+
         if (currentInstruction == "右上げて")
-        {
-            if (raiseScript.isRaisedR)
-                check.text = "true";
-            else
-                check.text = "false";
-        }
+            isCorrect = raiseScript.isRaisedR;
+
         if (currentInstruction == "右下げて")
-        {
-            if (!raiseScript.isRaisedR)
-                check.text = "true";
-            else
-                check.text = "false";
-        }
+            isCorrect = !raiseScript.isRaisedR;
+
         if (currentInstruction == "左上げて")
-        {
-            if (raiseScript.isRaisedL)
-                check.text = "true";
-            else
-                check.text = "false";
-        }
+            isCorrect = raiseScript.isRaisedL;
+
         if (currentInstruction == "左下げて")
+            isCorrect = !raiseScript.isRaisedL;
+
+        if (isCorrect)
         {
-            if (!raiseScript.isRaisedL)
-                check.text = "true";
-            else
-                check.text = "false";
+            check.text = "true";
+            successCount++;
+
+            if (successCount >= clearThreshold)
+            {
+                resultText.text = "GameClear!";
+                CancelInvoke(); // これでランダム指示とチェックを止める
+            }
+        }
+        else
+        {
+            check.text = "false";
         }
     }
 }
-
-
-

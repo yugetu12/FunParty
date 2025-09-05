@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class Rotate : MonoBehaviour
 {
-    [SerializeField] private float rotY = 4f;
+    [SerializeField] private float rotZ = 4f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
     }
 
 
@@ -15,6 +15,9 @@ public class Rotate : MonoBehaviour
 
     void Update()
     {
-        transform.Rotate(0, rotY * Time.deltaTime, 0);
+        if (Input.GetKey(KeyCode.J))
+        {
+            transform.Rotate(0, 0, rotZ * Time.deltaTime);
+        }
     }
 }
