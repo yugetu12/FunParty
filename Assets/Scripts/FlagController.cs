@@ -5,6 +5,7 @@ public class FlagController : MonoBehaviour
     [SerializeField] private string raiseKey = "f";
     [SerializeField] private float raiseSpeed = 60f;
     private bool raiseFlag;
+    public float rotZ;
 
     void Start()
     {
@@ -23,9 +24,8 @@ public class FlagController : MonoBehaviour
     void FixedUpdate()
     {
         //角度調整
-        float rotZ = transform.localEulerAngles.z;
+        rotZ = transform.localEulerAngles.z;
         if (rotZ > 180f) rotZ -= 360f;
-        Debug.Log(rotZ);
 
         //旗操作
         if (rotZ < 30f && raiseFlag)
