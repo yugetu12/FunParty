@@ -52,6 +52,7 @@ public class PlayerController : MonoBehaviour
             //y速度が静止状態ならジャンプ
             if (Mathf.Abs(rb.linearVelocity.y) < 0.01f) Jump();
         }
+        //ジャンプ中動けない
 
         //移動処理
         rb.linearVelocity = new Vector3(moveX * moveSpeed, rb.linearVelocity.y, moveZ * moveSpeed);
