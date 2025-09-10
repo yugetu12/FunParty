@@ -26,7 +26,10 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         //Space入力判定
-        if (Input.GetKeyDown(KeyCode.Space)) isJumping = true;
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            isJumping = true;
+        }
 
         //WASD入力判定
         moveX = Input.GetAxis("Horizontal");
