@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public bool canMove = true;
+
     private Rigidbody rb;                           //Rigidbodyを宣言
     private Vector3 originScale;                    //元の大きさ
     [SerializeField] private float jumpForce = 5f;  //ジャンプ力
@@ -52,6 +54,7 @@ public class PlayerController : MonoBehaviour
             //y速度が静止状態ならジャンプ
             if (Mathf.Abs(rb.linearVelocity.y) < 0.01f) Jump();
         }
+        //ジャンプ中動けない
 
         //移動処理
         rb.linearVelocity = new Vector3(moveX * moveSpeed, rb.linearVelocity.y, moveZ * moveSpeed);
