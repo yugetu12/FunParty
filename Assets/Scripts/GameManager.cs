@@ -8,8 +8,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        Instraction(infoText);
-        gameTime = 0.0f;
+
     }
 
     void Update()
