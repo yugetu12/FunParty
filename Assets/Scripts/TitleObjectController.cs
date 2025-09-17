@@ -22,11 +22,6 @@ public class TitleObjectController : MonoBehaviour
         rb.linearVelocity = Vector3.up * moveSpeed;
     }
 
-    void Update()
-    {
-
-    }
-
     void FixedUpdate()
     {
         //targetPosYを超えたら
