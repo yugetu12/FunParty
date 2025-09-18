@@ -9,11 +9,6 @@ public class ArmController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
-    }
-
-    void FixedUpdate()
-    {
-        Vector3 force = new Vector3(0.0f, 0.0f, -armSpeed);
-        rb.AddForce(force, ForceMode.VelocityChange);
+        rb.linearVelocity = new Vector3(0, 0, armSpeed);
     }
 }
