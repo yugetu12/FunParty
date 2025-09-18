@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     private float gameTime;
-    [SerializeField] private Text infoText;
+    public Text infoText;
 
     void Start()
     {
