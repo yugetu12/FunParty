@@ -25,15 +25,15 @@ public class spawn : MonoBehaviour
             int direction = Random.Range(0, 2);
             if (direction == 0)
             {
-                // 例: 左側
-                Instantiate(arm, new Vector3(0f, 0f, 0f), Quaternion.identity);
-                Instantiate(panel1, new Vector3(0f, 0f, 0f), Quaternion.identity);
+                
+                Instantiate(arm, new Vector3(-9.0f, 0f, 95f), Quaternion.Euler(90, 0, 0));
+                Instantiate(panel1, new Vector3(-9.5f, -2.0f, 95f), Quaternion.Euler(90, -180, 0));
             }
             else
             {
-                // 例: 右側
-                Instantiate(arm, new Vector3(0f, 0f, 0f), Quaternion.identity);
-                Instantiate(panel2, new Vector3(0f, 0f, 0f), Quaternion.identity);
+                
+                Instantiate(arm, new Vector3(-9.0f, 0f, 95f), Quaternion.Euler(90, 0, 0));
+                Instantiate(panel2, new Vector3(-9.5f, -2.0f, 95f), Quaternion.Euler(90, -180, 0));
             }
             yield return new WaitForSeconds(SpawnSpan);
         }
