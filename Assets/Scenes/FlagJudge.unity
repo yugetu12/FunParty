@@ -407,10 +407,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arm: {fileID: 5512770837412506121, guid: b9bafe505eee5b9428958ae08539e424, type: 3}
-  panel1: {fileID: 2167016509895801661, guid: 85368431ebece5d4ca04cb53dad88a17, type: 3}
-  panel2: {fileID: 9099714707483815737, guid: 726c747963040bb4f81c93a62b7c22c5, type: 3}
+  panel1: {fileID: 919132149155446097, guid: 77fb23b6b9d0607488bb33a25450c74f, type: 3}
+  panel2: {fileID: 919132149155446097, guid: 3a6341b3973321d4a9d1f5186f27bcf9, type: 3}
   GameState: 1
-  SpawnSpan: 1
+  SpawnSpan: 10
+  SpawnMany: 5
 --- !u!4 &525809697
 Transform:
   m_ObjectHideFlags: 0
@@ -448,7 +449,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9503a44ce6f68c0469b551a717c05900, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -8.34
+      value: -9.54
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9503a44ce6f68c0469b551a717c05900, type: 3}
       propertyPath: m_LocalPosition.y
@@ -493,7 +494,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9503a44ce6f68c0469b551a717c05900, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1937496657}
   m_SourcePrefab: {fileID: 100100000, guid: 9503a44ce6f68c0469b551a717c05900, type: 3}
 --- !u!1 &832575517
 GameObject:
@@ -581,15 +585,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6450799893005082215, guid: b9bafe505eee5b9428958ae08539e424, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 6450799893005082215, guid: b9bafe505eee5b9428958ae08539e424, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.0044910097
+      value: 0.003578
       objectReference: {fileID: 0}
     - target: {fileID: 6450799893005082215, guid: b9bafe505eee5b9428958ae08539e424, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.04380005
+      value: 0.0438
       objectReference: {fileID: 0}
     - target: {fileID: 6450799893005082215, guid: b9bafe505eee5b9428958ae08539e424, type: 3}
       propertyPath: m_LocalRotation.w
@@ -679,7 +683,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 5964241832015876386, guid: 85368431ebece5d4ca04cb53dad88a17, type: 3}
+      propertyPath: m_Convex
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5964241832015876386, guid: 85368431ebece5d4ca04cb53dad88a17, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 5964241832015876386, guid: 85368431ebece5d4ca04cb53dad88a17, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -689,6 +702,38 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6450799893005082215, guid: b9bafe505eee5b9428958ae08539e424, type: 3}
   m_PrefabInstance: {fileID: 1587682994}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1937496655 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 9503a44ce6f68c0469b551a717c05900, type: 3}
+  m_PrefabInstance: {fileID: 684570784}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &1937496657
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1937496655}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!4 &815684093020382
 Transform:
   m_ObjectHideFlags: 0
