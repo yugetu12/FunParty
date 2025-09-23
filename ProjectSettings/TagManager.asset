@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - Pole
+  - monitor
   layers:
   - Default
   - TransparentFX

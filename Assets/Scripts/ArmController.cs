@@ -15,7 +15,7 @@ public class ArmController : MonoBehaviour
     }
         void Update()
     {
-        if (transform.position.z < destroyZ)
+        if (transform.position.z > destroyZ)
         {
             Destroy(gameObject);
         }
