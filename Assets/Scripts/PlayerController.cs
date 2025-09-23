@@ -3,14 +3,16 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private Rigidbody rb;          //Rigidbody
-    [SerializeField] private float moveSpeed = 5f;  //移動速度
-    [SerializeField] private bool isAutoMove;       //自動移動の切り替え
-    private bool isEnableControll;                  //操作可能判定
-    private float moveX;                            //X方向の移動量
-    private float moveZ;                            //Z方向の移動量
-    private Vector3 moveVector;                     //移動ベクトル
-    private Vector3 targetPos;                      //目的地
+    [SerializeField] private Rigidbody rb;                  //Rigidbody
+    [SerializeField] private SendPlayerPosition sender;     //位置座標送信
+    [SerializeField] private int playerId = 0;              //プレイヤーID
+    [SerializeField] private float moveSpeed = 5f;          //移動速度
+    [SerializeField] private bool isAutoMove;               //自動移動の切り替え
+    private bool isEnableControll;                          //操作可能判定
+    private float moveX;                                    //X方向の移動量
+    private float moveZ;                                    //Z方向の移動量
+    private Vector3 moveVector;                             //移動ベクトル
+    private Vector3 targetPos;                              //目的地
     private float targetPosX = 0;
     private float targetPosZ = 0;
 
@@ -29,13 +31,13 @@ public class PlayerController : MonoBehaviour
             float distance = Vector3.Distance(transform.position, targetPos);
             if (distance < 0.1f)
             {
+                if (sender.latestData == null || sender.latestData.persons.Length == 0) return;
                 //目的地更新
-                targetPosX = Random.Range(-3.5f, 3.5f);//<-ここの値をカメラ情報で置き換え
-                targetPosZ = Random.Range(-3.5f, 3.5f);//<-ここの値をカメラ情報で置き換え
+                targetPosX = sender.x[playerId];
+                targetPosZ = sender.y[playerId];
             }
             //位置ベクトルの作成
             targetPos = new Vector3(targetPosX, transform.position.y, targetPosZ);
-            Debug.Log(targetPos);
         }
         //WASD入力判定
         else
