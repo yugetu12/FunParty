@@ -112,30 +112,39 @@ public class UDPImageReceiver : MonoBehaviour
             // 画像データを直接Texture2Dとして読み込み
             if (imageTexture == null)
             {
-                imageTexture = new Texture2D(2, 2);
+                imageTexture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
             }
             
-            // JPEGデータをTexture2Dに読み込み
+            // PNGデータをTexture2Dに読み込み（透明度込み）
             bool loaded = imageTexture.LoadImage(imageData);
             
             if (loaded)
             {
-                // Rendererに画像を設定
+                // 透明度をサポートするマテリアル設定
                 if (imageRenderer != null)
                 {
+                    // 透明度をサポートするシェーダーに変更
+                    if (imageRenderer.material.shader.name != "Sprites/Default")
+                    {
+                        imageRenderer.material.shader = Shader.Find("Sprites/Default");
+                    }
+                    
                     imageRenderer.material.mainTexture = imageTexture;
+                    
+                    // 透明度を有効にする
+                    imageRenderer.material.color = Color.white;
                 }
                 
-                Debug.Log($"Image received and displayed. Size: {imageTexture.width}x{imageTexture.height}");
+                Debug.Log($"透明度付き画像を受信・表示: {imageTexture.width}x{imageTexture.height}");
             }
             else
             {
-                Debug.LogWarning("Failed to load image data");
+                Debug.LogWarning("Failed to load PNG image data");
             }
         }
         catch (Exception e)
         {
-            Debug.LogError($"Error processing image: {e.Message}");
+            Debug.LogError($"Error processing transparent image: {e.Message}");
         }
     }
     
