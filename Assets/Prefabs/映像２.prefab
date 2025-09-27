@@ -182,7 +182,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6909947987040811006}
   m_Layer: 0
-  m_Name: "\u4F8B\u6620\u50CF2"
+  m_Name: "\u6620\u50CF\uFF12"
   m_TagString: monitor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

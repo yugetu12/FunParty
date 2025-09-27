@@ -34,7 +34,7 @@ public class ArmController : MonoBehaviour
         // 2. スポナーに敵が破壊されたことを通知し、カウンターを減らす
         if (ArmSpawn.Instance != null)
         {
-            ArmSpawn.Instance.EnemyDestroyed();
+            ArmSpawn.Instance.ArmDestroyed();
         }
 
         // 3. 敵自身を破壊 (これで spawn.cs の WaitUntil が解除される)

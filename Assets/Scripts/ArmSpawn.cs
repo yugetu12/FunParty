@@ -6,20 +6,17 @@ public class ArmSpawn : MonoBehaviour
     // どこからでもこのスクリプトを参照できるようにする（シングルトンパターン）
     public static ArmSpawn Instance;
 
-    public GameObject arm1;
-    public GameObject arm2;
     public GameObject panel1;
     public GameObject panel2;
+    public GameObject monitor1;
+    public GameObject monitor2;
 
     private Player clear;
 
 
     [Header("設定")]
     public int SpawnMany = 5;
-
-    // ★修正: 倒すべき残り敵数として使用
-    private int EnemiesRemaining;
-
+    private int ArmRest;
     void Awake()
     {
         if (Instance == null)
@@ -34,24 +31,23 @@ public class ArmSpawn : MonoBehaviour
 
     void Start()
     {
-        // 倒すべき総敵数に設定
-        clear = FindObjectOfType<Player>();
+        clear = FindObjectOfType<Player>();//playerスクリプトの取得
         if (clear == null)
         {
              Debug.LogError("FATAL: シーンに Player スクリプトが見つかりません！クリア処理は実行できません。");
         }
-        EnemiesRemaining = SpawnMany;
+        ArmRest = SpawnMany;
         StartCoroutine(SpawnRoutine());
     }
 
-    // ★追加: 敵が破壊されたときに、外部から呼ばれるメソッド
-    public void EnemyDestroyed()
+    //敵が破壊されたときに、外部から呼ばれるメソッド
+    public void ArmDestroyed()
     {
-        EnemiesRemaining--;
-        Debug.Log("アームが破壊されました。残り: " + EnemiesRemaining);
+        ArmRest--;
+        Debug.Log("アームが破壊されました。残り: " + ArmRest);
 
         // カウンターが0以下になったらゲームクリア
-        if (EnemiesRemaining <= 0)
+        if (ArmRest <= 0)
         {
             if (clear != null)
             {
@@ -71,20 +67,18 @@ public class ArmSpawn : MonoBehaviour
         {
             int direction = Random.Range(0, 2);
             GameObject spawnedArm; // スポーンした arm を保持する変数
-
-            // 2. panel をスポーン
             if (direction == 0)
             {
-                spawnedArm = Instantiate(arm1, new Vector3(-74.34321f, -1.57f, -56.9f), Quaternion.Euler(-90f, 0f, 0f));
-                Instantiate(panel1, new Vector3(16.85f, -0.3f, -17.26f), Quaternion.Euler(0f, -12.39f, 0f));
-                Instantiate(panel1, new Vector3(-15.37f, 0.01f, -17.73f), Quaternion.Euler(0f, 15.033f, 0f));
+                spawnedArm = Instantiate(panel1, new Vector3(5.483705f, -9.5f, -105.796f), Quaternion.Euler(-90f, 0f, 0f));
+                Instantiate(monitor1, new Vector3(16.37f, 0f, -43.76f), Quaternion.Euler(-88.165f, 0f, -13.026f));
+                Instantiate(monitor1, new Vector3(-21.92f, 0.01f, -41.66f), Quaternion.Euler(-88.165f, 0f, 14.664f));
                 Debug.Log("panel1 " + (i + 1));
             }
             else
             {
-                spawnedArm = Instantiate(arm2, new Vector3(-74.34321f, -1.57f, -56.9f), Quaternion.Euler(-90f, 0f, 0f));
-                Instantiate(panel2, new Vector3(16.85f, -0.3f, -17.26f), Quaternion.Euler(0f, -12.39f, 0f));
-                Instantiate(panel2, new Vector3(-15.37f, 0.01f, -17.73f), Quaternion.Euler(0f, 15.033f, 0f));
+                spawnedArm = Instantiate(panel2, new Vector3(5.483705f, -9.5f, -105.796f), Quaternion.Euler(-90f, 0f, 0f));
+                Instantiate(monitor2, new Vector3(15.8f, 0f, -44.53f), Quaternion.Euler(0f, -15.838f, 0f));
+                Instantiate(monitor2, new Vector3(-21.72f, 0.01f, -41.01f), Quaternion.Euler(0f, 14.222f, 0f));
                 Debug.Log("panel2 " + (i + 1));
             }
 
