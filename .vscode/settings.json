@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "mikanty.sln"
+    "dotnet.defaultSolution": "FunParty.sln"
 }
