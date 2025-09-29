@@ -87,7 +87,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
-  explosionEffect: {fileID: 6811496748360841278, guid: 6c08ef0b06c65fb47a077012b4bbd53a, type: 3}
 --- !u!114 &7461925798377698558
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143,7 +142,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
