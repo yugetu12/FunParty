@@ -17,7 +17,7 @@ public class PlayerHealth : MonoBehaviour
 
         UpdateHPUI();
 
-        if (hp <= 0)
+        if (hp == 0)
         {
             SceneManager.LoadScene("GameOverScene");
         }

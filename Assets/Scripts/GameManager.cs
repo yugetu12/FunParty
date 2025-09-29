@@ -4,24 +4,28 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     private float gameTime;
-    [SerializeField] private Text infoText;
+    public Text infoText;
 
     void Start()
     {
-        Instraction(infoText);
+        if (infoText == null)
+        {
+            infoText = GameObject.Find("infoText").GetComponent<Text>();
+        }
+        Instruction(infoText);
         gameTime = 0.0f;
     }
 
     void Update()
     {
+        //旗上げゲームにはTextが必要
+        if (infoText == null) return;
+
         gameFlagJudge(infoText);
     }
 
     private void gameFlagJudge(Text infoText)
     {
-        //旗上げゲームにはTextが必要
-        if (infoText == null) return;
-
         //判定
         if (gameTime > 10.5f)
         {
@@ -31,12 +35,12 @@ public class GameManager : MonoBehaviour
             Debug.Log(Judge(infoText) ? "Correct!" : "Wrong!");
 
             //指示を変える
-            Instraction(infoText);
+            Instruction(infoText);
         }
         //計測
         gameTime += Time.deltaTime;
     }
-    private void Instraction(Text infoText)
+    private void Instruction(Text infoText)
     {
         //指示をランダムにする
         string infoLR, infoTB;
