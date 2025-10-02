@@ -1,26 +1,23 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
+
 public class PistonManager : MonoBehaviour
 {
-    private Rigidbody rb;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [SerializeField] private Rigidbody rb;
+    [SerializeField] private float limitY;
+    private Vector3 originPos;
+
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        StartCoroutine(PistonMove());
+        //位置の保存
+        originPos = transform.position;
+
+        //下向きに速度を与える
+        rb.linearVelocity = new Vector3(0, speed, 0);
     }
 
-    // Update is called once per frame
     void Update()
     {
-    }
 
-    IEnumerator PistonMove()
-    {
-        while (true)
-        {
-            rb.AddForce(Vector3.up * 18f, ForceMode.Impulse);
-            yield return new WaitForSeconds(5f);
-        }
     }
 }
