@@ -249,9 +249,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 151146523}
-  - component: {fileID: 151146526}
   - component: {fileID: 151146525}
-  - component: {fileID: 151146524}
+  - component: {fileID: 151146526}
   m_Layer: 0
   m_Name: "\u52D5\u304F\u3068\u3053\u308D.001"
   m_TagString: Untagged
@@ -281,27 +280,6 @@ Transform:
   - {fileID: 959496316}
   m_Father: {fileID: 8947608325636664919}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &151146524
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 151146522}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.16986495, y: 0.17898765, z: 0.21682872}
-  m_Center: {x: 0.0005956554, y: -0.0034310627, z: -0.20278579}
 --- !u!54 &151146525
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -324,10 +302,10 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 122
   m_CollisionDetection: 0
 --- !u!114 &151146526
 MonoBehaviour:
@@ -341,6 +319,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5961b2a9a0f5064a91987cf0906d196, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 151146525}
+  speed: 8
+  limitZ: 0.15
 --- !u!1 &190669992
 GameObject:
   m_ObjectHideFlags: 0
@@ -787,11 +768,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arms: {fileID: 1121393805}
+  monitor: {fileID: 0}
   players: {fileID: 1247545819}
   limitZ: 0
   panelPrefabs:
   - {fileID: 2167016509895801661, guid: 85368431ebece5d4ca04cb53dad88a17, type: 3}
   - {fileID: 9099714707483815737, guid: 726c747963040bb4f81c93a62b7c22c5, type: 3}
+  monitorTexture: []
 --- !u!1 &740982979 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2252548941638521835, guid: f5631c2358c74d643a781e0e4c915e67, type: 3}
@@ -2086,7 +2069,7 @@ Transform:
   m_GameObject: {fileID: 1802333425336996151}
   serializedVersion: 2
   m_LocalRotation: {x: 7.1054265e-15, y: -0, z: -7.1054265e-15, w: 1}
-  m_LocalPosition: {x: 0.0017998865, y: -0.001208144, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2108,9 +2091,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1733254302826322042}
-  - component: {fileID: 1802333425336996153}
   - component: {fileID: 1802333425336996152}
-  - component: {fileID: 1802333425336996154}
+  - component: {fileID: 1802333425336996153}
   m_Layer: 0
   m_Name: "\u52D5\u304F\u3068\u3053\u308D.001"
   m_TagString: Untagged
@@ -2140,10 +2122,10 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 122
   m_CollisionDetection: 0
 --- !u!114 &1802333425336996153
 MonoBehaviour:
@@ -2157,27 +2139,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5961b2a9a0f5064a91987cf0906d196, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!65 &1802333425336996154
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1802333425336996151}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.16986495, y: 0.17898765, z: 0.21682872}
-  m_Center: {x: 0.0005956554, y: -0.0034310627, z: -0.20278579}
+  rb: {fileID: 1802333425336996152}
+  speed: 8
+  limitZ: 0.15
 --- !u!33 &1817796207756667912
 MeshFilter:
   m_ObjectHideFlags: 0

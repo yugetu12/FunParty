@@ -29,9 +29,11 @@ public class ArmController : MonoBehaviour
         }
         //新しいアイテムをセット
         GameObject newPanel = Instantiate(panelObj, arm);
+        //ローカル値に調整
         newPanel.transform.localPosition = originPos;
         newPanel.transform.localRotation = originRot;
         newPanel.transform.localScale = originScale;
+        //新オブジェクトをパネルに入れる
         panel = newPanel;
     }
 }

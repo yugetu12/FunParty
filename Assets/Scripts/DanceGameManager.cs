@@ -3,9 +3,11 @@ using UnityEngine;
 public class DanceGameManager : MonoBehaviour
 {
     [SerializeField] private GameObject arms;       //アーム
+    [SerializeField] private GameObject monitor;    //モニター
     [SerializeField] private GameObject players;    //プレイヤー
     [SerializeField] private float limitZ = 0;      //制限z座標
     [SerializeField] private GameObject[] panelPrefabs;
+    [SerializeField] private Texture2D[] monitorTexture;
     private Vector3 originPos;
 
     void Start()
@@ -27,7 +29,7 @@ public class DanceGameManager : MonoBehaviour
         //パネル変更
         int index = Random.Range(0, panelPrefabs.Length);
         arms.GetComponent<ArmController>().ChangePanel(panelPrefabs[index]);
-        
+
         //正誤判定
         PlayerManager player = players.GetComponent<PlayerManager>();
         if (player.posetrue)
