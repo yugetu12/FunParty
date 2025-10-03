@@ -249,6 +249,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 8911137894382403231}
   armSpeed: 5
+  arm: {fileID: 0}
   panel: {fileID: 2252548941638521835}
 --- !u!1 &2432025379409337015
 GameObject:
