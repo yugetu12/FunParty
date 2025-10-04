@@ -37,11 +37,4 @@ public class PlayerHealth : MonoBehaviour
             }
         }
     }
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("FallingObject"))
-        {
-            TakeDamage(1);
-        }
-    }
 }

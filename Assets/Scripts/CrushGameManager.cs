@@ -15,6 +15,8 @@ public class CrushGameManager : MonoBehaviour
 
     void Start()
     {
+        //出現確率の配列を初期化
+        spawnChance = new float[fallingObjects.Count];
         //出現間隔を代入
         interval = intervalMax;
         time = interval;

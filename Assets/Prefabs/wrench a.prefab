@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: wrench a
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3610f6f8a089e654e87f47ef8ead7edb, type: 3}
+      propertyPath: m_TagString
+      value: FallingObject
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
