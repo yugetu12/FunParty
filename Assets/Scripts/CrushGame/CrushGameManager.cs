@@ -4,13 +4,16 @@ using UnityEngine;
 
 public class CrushGameManager : MonoBehaviour
 {
-    [SerializeField] private List<FallingObjectSetting> fallingObjects; //ObjectPrefab
-    [SerializeField] private GameTimer timer;       //時間管理Script
-    private float[] spawnChance;                    //出現確率
-    [SerializeField] private Transform spawnArea;   //出現場所
-    [SerializeField] private float range;           //出現範囲
-    [SerializeField] private float intervalMax;     //最大出現間隔
-    private float interval;                         //出現間隔
+    [SerializeField] private ChangeScene scene;             //Scene管理スクリプト
+    [SerializeField] private PlayerHealth hp;               //HP管理スクリプト
+    [SerializeField] private GameTimer timer;               //時間管理スクリプト
+    [SerializeField] private GameObject player;             //プレイヤーオブジェクト
+    [SerializeField] private GameObject[] fallingObjects;   //落ち物オブジェクト
+    [SerializeField] private Transform spawnArea;           //出現場所
+    [SerializeField] private float range;                   //出現範囲
+    [SerializeField] private float intervalMax;             //最大出現間隔
+    [SerializeField] private float intervalMultiply;        //出現間隔変化倍率
+    private float interval;                                 //出現間隔
     private float time;
 
     void Start()
@@ -18,11 +21,6 @@ public class CrushGameManager : MonoBehaviour
         //出現間隔を代入
         interval = intervalMax;
         time = interval;
-        //出現確率を代入
-        for (int i = 0; i < fallingObjects.Count; i++)
-        {
-            spawnChance[i] = fallingObjects[i].spawnChance;
-        }
     }
 
     void Update()
@@ -34,16 +32,27 @@ public class CrushGameManager : MonoBehaviour
             //一定間隔で実行
             time = interval;
             IntervalChange();
-            SpawnObject();
+            //ランダム生成
+            Vector3 spawnPos = new Vector3(spawnArea.position.x + Random.Range(-range, range), spawnArea.position.y + 20f, spawnArea.position.z + Random.Range(-range, range));
+            SpawnObject(Random.Range(0, fallingObjects.Length), spawnPos);
+            if (Random.Range(0, 1f) < (interval / intervalMax))
+            {
+                //プレイヤー位置を取得して生成
+                Vector3 playerPos = player.transform.position;
+                playerPos.y += 20f;
+                SpawnObject(Random.Range(0, fallingObjects.Length), playerPos);
+            }
         }
+
+        //ゲームオーバー
+        if (hp.hp <= 0) scene.LoadScene("GameOverScene");
+        //ゲームクリア
+        if (timer.currentTime < 0) scene.LoadScene("GameClearScene");
     }
 
-    private void SpawnObject()
+    private void SpawnObject(int index, Vector3 pos)
     {
-        //生成
-        int index = Random.Range(0, 5);
-        Vector3 spawnPos = new Vector3(spawnArea.position.x + Random.Range(-range, range), spawnArea.position.y + 10f, spawnArea.position.z + Random.Range(-range, range));
-        Instantiate(fallingObjects[index].prefab, spawnPos, Quaternion.identity);
+        Instantiate(fallingObjects[index], pos, fallingObjects[index].transform.rotation);
     }
     private void IntervalChange()
     {
@@ -52,7 +61,7 @@ public class CrushGameManager : MonoBehaviour
         {
             if (timer.currentTime < timer.timeSet[i])
             {
-                interval = (intervalMax + interval) / 2 * timer.timeSet[i] / timer.timeLimit;
+                interval = ((intervalMax + interval) * (timer.timeSet[i] / timer.timeLimit)) * intervalMultiply;
             }
         }
     }

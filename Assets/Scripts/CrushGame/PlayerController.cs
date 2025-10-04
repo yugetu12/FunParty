@@ -4,6 +4,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private Rigidbody rb;                  //Rigidbody
+    [SerializeField] private Animator animator;             //Animator
     [SerializeField] private SendPlayerPosition sender;     //位置座標送信
     [SerializeField] private int playerId = 0;              //プレイヤーID
     [SerializeField] private float moveSpeed = 5f;          //移動速度
@@ -24,7 +25,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        //カメラ情報判定(未完成)
+        //カメラ情報判定
         if (isAutoMove)
         {
             //距離を計測
@@ -48,6 +49,8 @@ public class PlayerController : MonoBehaviour
             //移動ベクトルを作成
             moveVector = new Vector3(moveX * moveSpeed, rb.linearVelocity.y, moveZ * moveSpeed);
         }
+        //アニメーション
+        animator.SetFloat("MoveSpeed", rb.linearVelocity.magnitude);
     }
 
     void FixedUpdate()

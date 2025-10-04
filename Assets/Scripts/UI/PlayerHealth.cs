@@ -1,29 +1,28 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public int hp = 3;
+    [HideInInspector] public int hp;    //HP
+    public Image[] hpIcons;             //HP画像
+    public Sprite robotFace;            //画像素材
+    public Sprite robotCrossed;         //画像素材
 
-    public Image[] hpIcons;
-    public Sprite robotFace;
-    public Sprite robotCrossed;
+    void Start()
+    {
+        //画像の枚数分だけHPを設定
+        hp = hpIcons.Length;
+    }
 
     public void TakeDamage(int amount)
     {
+        //HPを減らす
         hp -= amount;
-        hp = Mathf.Clamp(hp, 0, 3);
-
+        //UI更新
         UpdateHPUI();
-
-        if (hp == 0)
-        {
-            SceneManager.LoadScene("GameOverScene");
-        }
     }
 
-    void UpdateHPUI()
+    public void UpdateHPUI()
     {
         for (int i = 0; i < hpIcons.Length; i++)
         {
@@ -35,13 +34,6 @@ public class PlayerHealth : MonoBehaviour
             {
                 hpIcons[i].sprite = robotCrossed;
             }
-        }
-    }
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("FallingObject"))
-        {
-            TakeDamage(1);
         }
     }
 }

@@ -13,14 +13,7 @@ public class GameTimer : MonoBehaviour
 
     void Update()
     {
-        if (currentTime > 0)
-        {
-            currentTime -= Time.deltaTime;
-            if (currentTime < 0)
-            {
-                currentTime = 0;
-                GetComponent<ChangeScene>().LoadScene("GameClearScene");
-            }
-        }
+        //時間を計測
+        if (currentTime > 0) currentTime -= Time.deltaTime;
     }
 }

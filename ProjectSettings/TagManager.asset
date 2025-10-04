@@ -8,6 +8,7 @@ TagManager:
   - Pole
   - monitor
   - panel
+  - FallingObject
   layers:
   - Default
   - TransparentFX
