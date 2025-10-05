@@ -2,15 +2,18 @@ using UnityEngine;
 
 public class SuccessCount : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [HideInInspector] public int count;
+    public GameObject[] signs;
+    [SerializeField] private GameObject lightYellow;
+
     void Start()
     {
-        
+        count = 0;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void CountPlus()
     {
-        
+        signs[count].GetComponent<SignLightManager>().ChangeLight(lightYellow);
+        count++;
     }
 }
