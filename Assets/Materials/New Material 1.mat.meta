@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<< HEAD:Assets/Materials/New Material 1.mat.meta
-guid: 5f9dc8e1709d0134980654ff5c82dea4
-=======
 guid: a6d7a2d1701cb334fb4e0a7add2040c0
->>>>>>> ttest:Assets/Prefabs/Materials/New Material 1.mat.meta
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 2100000
