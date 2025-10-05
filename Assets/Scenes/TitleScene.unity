@@ -317,7 +317,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ef833d5e688cdc478da3de1bfa2a205, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scene: {fileID: 0}
+  scene: {fileID: 330585549}
+  keyScenePairs:
+  - key: 102
+    sceneName: DanceSetup
+  - key: 112
+    sceneName: CrushSetup
+  - key: 116
+    sceneName: TitleScene
 --- !u!114 &330585549
 MonoBehaviour:
   m_ObjectHideFlags: 0

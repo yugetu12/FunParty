@@ -3,15 +3,25 @@ using UnityEngine;
 [RequireComponent(typeof(ChangeScene))]
 public class DebugScript : MonoBehaviour
 {
-    [SerializeField] private ChangeScene scene;   //Script
-
-    void Start()
+    [System.Serializable]
+    public class KeyScenePair
     {
-        if (scene == null) scene = GetComponent<ChangeScene>();
+        public KeyCode key;          // 押すキー
+        public string sceneName;     // 飛ぶ先のシーン名
     }
+
+    [SerializeField] private ChangeScene scene;     //シーン管理スクリプト
+    public KeyScenePair[] keyScenePairs;            // エディタで複数設定できる配列
 
     void Update()
     {
-        if (Input.GetKeyDown("r")) scene.ReloadScene();
+        foreach (var pair in keyScenePairs)
+        {
+            if (Input.GetKeyDown(pair.key))
+            {
+                scene.LoadScene(pair.sceneName);
+                break;
+            }
+        }
     }
 }

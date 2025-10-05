@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/DanceSetup.unity
     guid: ff36d775e49be2c468552ec6e400bd2f
   - enabled: 1
-    path: Assets/Scenes/PrepareMikanScene.unity
+    path: Assets/Scenes/CrushSetup.unity
     guid: 9ea270602ff876b41ac5ef407f5b5a3c
   - enabled: 1
     path: Assets/Scenes/FlagJudge.unity
