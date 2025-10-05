@@ -82,10 +82,5 @@ public class PlayerController : MonoBehaviour
         {
             isEnableControll = true;
         }
-        //他のものに当たっても動けるように
-        else if (collision.gameObject.CompareTag("FallingObject"))
-        {
-            
-        }
     }
 }
