@@ -15,15 +15,22 @@ public class PoseResultUDPReceiver : MonoBehaviour
     public bool isPoseSuccess = false;
     public float angleError = 0f;
     public string lastUpdateTime = "";
+    public int currentPoseNumber = 0;
+    public float successDuration = 0f;
+    public float requiredDuration = 2.0f;
     
     [Header("UI表示")]
     public UnityEngine.UI.Text statusText;
     public UnityEngine.UI.Text errorText;
     public UnityEngine.UI.Text connectionText;
+    public UnityEngine.UI.Text poseNumberText;
+    public UnityEngine.UI.Text progressText;
     
     [Header("イベント")]
     public UnityEngine.Events.UnityEvent OnPoseSuccess;
     public UnityEngine.Events.UnityEvent OnPoseFail;
+    public UnityEngine.Events.UnityEvent OnPoseComplete;  // 2秒間成功してクリア
+    public UnityEngine.Events.UnityEvent OnPoseChange;  // ポーズ番号が変わった
     
     [Header("デバッグ")]
     public bool showDebugGUI = true;
@@ -42,6 +49,18 @@ public class PoseResultUDPReceiver : MonoBehaviour
         public float angle_error;
         public double timestamp;
         public System.Collections.Generic.Dictionary<string, float> angles;
+        public int pose_number;
+        public float success_duration;
+        public float required_duration;
+    }
+    
+    [System.Serializable]
+    public class PoseChangeMessage
+    {
+        public string type;
+        public int pose_number;
+        public int remaining_poses;
+        public double timestamp;
     }
     
     private readonly System.Collections.Generic.Queue<PoseMessage> messageQueue = 
@@ -100,14 +119,26 @@ public class PoseResultUDPReceiver : MonoBehaviour
     {
         try
         {
-            PoseMessage poseMsg = JsonConvert.DeserializeObject<PoseMessage>(jsonMessage);
+            // まずtypeを確認
+            var msgType = JsonConvert.DeserializeObject<System.Collections.Generic.Dictionary<string, object>>(jsonMessage);
             
-            if (poseMsg.type == "pose_result")
+            if (msgType.ContainsKey("type"))
             {
-                // メインスレッドで実行するためキューに追加
-                lock (messageQueue)
+                string type = msgType["type"].ToString();
+                
+                if (type == "pose_result")
                 {
-                    messageQueue.Enqueue(poseMsg);
+                    PoseMessage poseMsg = JsonConvert.DeserializeObject<PoseMessage>(jsonMessage);
+                    // メインスレッドで実行するためキューに追加
+                    lock (messageQueue)
+                    {
+                        messageQueue.Enqueue(poseMsg);
+                    }
+                }
+                else if (type == "pose_change")
+                {
+                    PoseChangeMessage changeMsg = JsonConvert.DeserializeObject<PoseChangeMessage>(jsonMessage);
+                    HandlePoseChange(changeMsg);
                 }
             }
         }
@@ -116,6 +147,13 @@ public class PoseResultUDPReceiver : MonoBehaviour
             Debug.LogError($"メッセージ処理エラー: {e.Message}");
             Debug.LogError($"受信メッセージ: {jsonMessage}");
         }
+    }
+    
+    void HandlePoseChange(PoseChangeMessage msg)
+    {
+        currentPoseNumber = msg.pose_number;
+        Debug.Log($"新しいポーズに変更: ポーズ #{msg.pose_number} (残り: {msg.remaining_poses})");
+        OnPoseChange?.Invoke();
     }
     
     void Update()
@@ -139,21 +177,47 @@ public class PoseResultUDPReceiver : MonoBehaviour
         UpdateUI();
     }
     
+    private bool wasCompleted = false;
+    
     void HandlePoseResult(PoseMessage msg)
     {
         isPoseSuccess = msg.success;
         angleError = msg.angle_error;
         lastUpdateTime = DateTime.Now.ToString("HH:mm:ss.fff");
         
-        Debug.Log($"ポーズ判定: {(msg.success ? "成功" : "失敗")} (誤差: {msg.angle_error:F1}度)");
+        // ポーズ番号と成功持続時間を更新
+        if (msg.pose_number > 0)
+        {
+            currentPoseNumber = msg.pose_number;
+        }
         
         if (msg.success)
         {
+            successDuration = msg.success_duration;
+            requiredDuration = msg.required_duration;
+            
+            // 2秒間成功を維持したかチェック
+            bool isCompleted = successDuration >= requiredDuration;
+            
+            if (isCompleted && !wasCompleted)
+            {
+                Debug.Log($"ポーズ #{currentPoseNumber} 完全クリア！ (2秒維持)");
+                OnPoseComplete?.Invoke();
+                PlaySuccessEffect();
+                wasCompleted = true;
+            }
+            else if (!isCompleted)
+            {
+                Debug.Log($"ポーズ #{currentPoseNumber} 維持中: {successDuration:F1}s / {requiredDuration:F1}s (誤差: {msg.angle_error:F1}度)");
+                wasCompleted = false;
+            }
+            
             OnPoseSuccess?.Invoke();
-            PlaySuccessEffect();
         }
         else
         {
+            successDuration = 0f;
+            wasCompleted = false;
             OnPoseFail?.Invoke();
         }
     }
@@ -183,8 +247,21 @@ public class PoseResultUDPReceiver : MonoBehaviour
     {
         if (statusText != null)
         {
-            statusText.text = isPoseSuccess ? "成功!" : "再挑戦";
-            statusText.color = isPoseSuccess ? Color.green : Color.red;
+            if (isPoseSuccess && successDuration >= requiredDuration)
+            {
+                statusText.text = "クリア!";
+                statusText.color = Color.cyan;
+            }
+            else if (isPoseSuccess)
+            {
+                statusText.text = "維持中...";
+                statusText.color = Color.yellow;
+            }
+            else
+            {
+                statusText.text = "再挑戦";
+                statusText.color = Color.red;
+            }
         }
         
         if (errorText != null)
@@ -196,6 +273,21 @@ public class PoseResultUDPReceiver : MonoBehaviour
         {
             connectionText.text = hasRecentData ? "Python接続中" : "Python待機中";
             connectionText.color = hasRecentData ? Color.green : Color.yellow;
+        }
+        
+        if (poseNumberText != null)
+        {
+            poseNumberText.text = $"ポーズ #{currentPoseNumber}";
+        }
+        
+        if (progressText != null && isPoseSuccess)
+        {
+            float progress = Mathf.Clamp01(successDuration / requiredDuration);
+            progressText.text = $"進捗: {progress * 100:F0}% ({successDuration:F1}s / {requiredDuration:F1}s)";
+        }
+        else if (progressText != null)
+        {
+            progressText.text = "ポーズを取ってください";
         }
     }
     
@@ -231,13 +323,16 @@ public class PoseResultUDPReceiver : MonoBehaviour
     {
         if (!showDebugGUI) return;
         
-        GUILayout.BeginArea(new Rect(10, 10, 300, 200));
+        GUILayout.BeginArea(new Rect(10, 10, 350, 250));
         
         GUILayout.Label("=== ポーズ判定受信状況 ===");
         GUILayout.Label($"接続状態: {(hasRecentData ? "受信中" : "待機中")}");
         GUILayout.Label($"ポート: {udpPort}");
+        GUILayout.Label($"現在のポーズ: #{currentPoseNumber}");
         GUILayout.Label($"ポーズ判定: {(isPoseSuccess ? "成功" : "失敗")}");
         GUILayout.Label($"角度誤差: {angleError:F1}度");
+        GUILayout.Label($"維持時間: {successDuration:F1}s / {requiredDuration:F1}s");
+        GUILayout.Label($"進捗: {(successDuration / requiredDuration * 100):F0}%");
         GUILayout.Label($"最終更新: {lastUpdateTime}");
         GUILayout.Label($"キュー内メッセージ: {messageQueue.Count}");
         
@@ -265,5 +360,25 @@ public class PoseResultUDPReceiver : MonoBehaviour
     public float GetLastError()
     {
         return angleError;
+    }
+    
+    public int GetCurrentPoseNumber()
+    {
+        return currentPoseNumber;
+    }
+    
+    public float GetSuccessDuration()
+    {
+        return successDuration;
+    }
+    
+    public float GetSuccessProgress()
+    {
+        return Mathf.Clamp01(successDuration / requiredDuration);
+    }
+    
+    public bool IsPoseCompleted()
+    {
+        return successDuration >= requiredDuration;
     }
 }
