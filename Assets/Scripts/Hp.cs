@@ -13,6 +13,7 @@ public class Hp : MonoBehaviour
     }
     void Update()
     {
+        
     }
 
     // 外部から呼ばれてHPを減らすメソッド
