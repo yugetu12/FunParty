@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ArmController : MonoBehaviour
+public class ArmManager : MonoBehaviour
 {
     [SerializeField] private Rigidbody rb;              //Rigidbody
     [SerializeField] private float armSpeed = 1.0f;     //速度

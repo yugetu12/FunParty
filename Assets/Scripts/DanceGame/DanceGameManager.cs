@@ -5,9 +5,12 @@ public class DanceGameManager : MonoBehaviour
     [SerializeField] private GameObject arms;       //アーム
     [SerializeField] private GameObject monitor;    //モニター
     [SerializeField] private GameObject players;    //プレイヤー
+    [SerializeField] private GameObject[] signs;    //サインライト
     [SerializeField] private float limitZ = 0;      //制限z座標
     [SerializeField] private Texture2D[] poseTexture;
+    [SerializeField] private GameObject[] colorLights;
     private Vector3 originPos;
+    private int countSuccess;
 
     void Start()
     {
