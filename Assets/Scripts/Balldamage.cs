@@ -3,8 +3,8 @@ using UnityEngine;
 public class Balldamage : MonoBehaviour
 {
     public int damage = 1;
-    public GameObject explosionEffect;
-    void OnCollisionEnter(Collision collision)
+    
+    void OnTriggerEnter(Collider collision)
     {
         //プレイヤー
         if (collision.gameObject.CompareTag("Player"))
@@ -15,22 +15,12 @@ public class Balldamage : MonoBehaviour
                 hP.TakeDamage(damage);
             }
 
-            TriggerExplosion();
             Destroy(gameObject);
         }
         //足場
         else if (collision.gameObject.CompareTag("Ground"))
         {
-            TriggerExplosion();
             Destroy(gameObject);
         }
     }
-
-    void TriggerExplosion()
-    {
-        if (explosionEffect != null)
-        {
-            Instantiate(explosionEffect, transform.position, Quaternion.identity);
-        }
-    }           
 }

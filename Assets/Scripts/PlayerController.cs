@@ -1,79 +1,83 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
-    public bool canMove = true;
-
-    private Rigidbody rb;                           //Rigidbodyを宣言
-    private Vector3 originScale;                    //元の大きさ
-    [SerializeField] private float jumpForce = 5f;  //ジャンプ力
-    [SerializeField] private float moveSpeed = 5f;  //移動速度
-    [SerializeField] private float gravity = 5f;    //重力
-    private float moveX;                            //X方向の移動量
-    private float moveZ;                            //Z方向の移動量
-    private bool isEnableControll;                  //操作可能判定
-    private bool isJumping;                         //ジャンプ判定
-    private bool isStooping;                        //しゃがみ判定
+    [SerializeField] private Rigidbody rb;                  //Rigidbody
+    [SerializeField] private SendPlayerPosition sender;     //位置座標送信
+    [SerializeField] private int playerId = 0;              //プレイヤーID
+    [SerializeField] private float moveSpeed = 5f;          //移動速度
+    [SerializeField] private bool isAutoMove;               //自動移動の切り替え
+    private bool isEnableControll;                          //操作可能判定
+    private float moveX;                                    //X方向の移動量
+    private float moveZ;                                    //Z方向の移動量
+    private Vector3 moveVector;                             //移動ベクトル
+    private Vector3 targetPos;                              //目的地
+    private float targetPosX = 0;
+    private float targetPosZ = 0;
 
     void Start()
     {
-        //元の大きさを保存
-        originScale = transform.localScale;
-        // Rigidbodyコンポーネントを取得
-        rb = GetComponent<Rigidbody>();
-        //重力設定
-        Physics.gravity = new Vector3(0, gravity * -1f, 0);
+        //移動不可
+        isEnableControll = false;
     }
 
     void Update()
     {
-        //Space入力判定
-        if (Input.GetKeyDown(KeyCode.Space))
+        //カメラ情報判定(未完成)
+        if (isAutoMove)
         {
-            isJumping = true;
+            //距離を計測
+            float distance = Vector3.Distance(transform.position, targetPos);
+            if (distance < 0.1f)
+            {
+                if (sender.latestData == null || sender.latestData.persons.Length == 0) return;
+                //目的地更新
+                targetPosX = sender.x[playerId];
+                targetPosZ = sender.y[playerId];
+            }
+            //位置ベクトルの作成
+            targetPos = new Vector3(targetPosX, transform.position.y, targetPosZ);
         }
-
         //WASD入力判定
-        moveX = Input.GetAxis("Horizontal");
-        moveZ = Input.GetAxis("Vertical");
-
-        //Shift入力判定
+        else
+        {
+            //移動ベクトルのx成分とz成分を取得
+            moveX = Input.GetAxis("Horizontal");
+            moveZ = Input.GetAxis("Vertical");
+            //移動ベクトルを作成
+            moveVector = new Vector3(moveX * moveSpeed, rb.linearVelocity.y, moveZ * moveSpeed);
+        }
     }
 
     void FixedUpdate()
     {
-        //操作制限
-        if (Mathf.Abs(rb.linearVelocity.y) > 0.01f) isEnableControll = false;
-
         if (!isEnableControll) return;
 
-        //ジャンプ処理
-        if (isJumping)
-        {
-            isJumping = false;
-            //y速度が静止状態ならジャンプ
-            if (Mathf.Abs(rb.linearVelocity.y) < 0.01f) Jump();
-        }
-        //ジャンプ中動けない
-
         //移動処理
-        rb.linearVelocity = new Vector3(moveX * moveSpeed, rb.linearVelocity.y, moveZ * moveSpeed);
-
-        //しゃがみ処理
+        if (isAutoMove)
+        {
+            //移動
+            rb.MovePosition(Vector3.MoveTowards(rb.position, targetPos, moveSpeed * Time.fixedDeltaTime));
+            //回転
+            transform.LookAt(targetPos);
+        }
+        else
+        {
+            //移動
+            rb.linearVelocity = moveVector;
+            //回転
+            if (Mathf.Abs(moveVector.magnitude) < 0.1) return;
+            transform.rotation = Quaternion.LookRotation(moveVector);
+        }
     }
 
-    private void Jump()
+    void OnCollisionEnter(Collision collision)
     {
-        //上向きに力を加える
-        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-    }
-
-    void OnCollisionStay(Collision collision)
-    {
-        //地面に接触したら操作可能にする
-        if (collision.gameObject.CompareTag("Ground") && !isEnableControll) isEnableControll = true;
-
-        //ポールに接触したら操作不可能にする
-        if (collision.gameObject.CompareTag("Pole") && isEnableControll) isEnableControll = false;
+        //衝突オブジェクトのタグがGroundかを判定
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isEnableControll = true;
+        }
     }
 }
