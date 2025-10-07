@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -8,44 +8,37 @@ using Newtonsoft.Json;
 using System.Linq;
 
 /// <summary>
-/// Pythonから送信される全ポーズマッチ情報を受信し、
-/// Unity側でランダムに選んだポーズと合致しているか検証するクラス
+/// Pythonから送信されるポーズマッチ情報を受信し、
+/// ゲーム内で表示されているポーズ画像の番号と照合して検証するクラス
 /// </summary>
 public class PoseMatchValidator : MonoBehaviour
 {
     [Header("UDP設定")]
     [SerializeField] private int receivePort = 5006;
     
-    [Header("ポーズ設定")]
-    [SerializeField] private int totalPoseCount = 20;  // sample_pose.jsonに保存されているポーズの総数
-    [SerializeField] private float matchThreshold = 15.0f;  // 角度誤差の閾値
+    [Header("ゲーム連携")]
+    [SerializeField] private DanceGameManager danceGameManager;
+    [SerializeField] private PlayerManager playerManager;
     
-    [Header("ゲームロジック")]
-    [SerializeField] private float poseDuration = 3.0f;  // 各ポーズの表示時間(秒)
-    [SerializeField] private bool autoChangepose = true;  // 自動でポーズを切り替えるか
+    [Header("デバッグ設定")]
+    [SerializeField] private bool enableDebugGUI = true;
     
-    [Header("UI表示(オプション)")]
-    [SerializeField] private UnityEngine.UI.Text statusText;
-    [SerializeField] private UnityEngine.UI.Text currentPoseText;
-    [SerializeField] private UnityEngine.UI.Text matchedPosesText;
-    [SerializeField] private UnityEngine.UI.Text scoreText;
-    [SerializeField] private UnityEngine.UI.Image poseReferenceImage;  // ポーズ参考画像
-    [SerializeField] private Sprite[] poseReferenceSprites;  // ポーズ参考画像の配列
-    
-    // UDP受信用
     private UdpClient udpClient;
     private Thread receiveThread;
     private bool isRunning = false;
     
-    // 現在のゲーム状態
-    private int currentTargetPoseNumber = -1;  // Unity側が現在提示しているポーズ番号(1始まり)
-    private List<int> matchedPoseNumbers = new List<int>();  // Pythonから送られてきた合致ポーズリスト
-    private float lastPoseChangeTime = 0f;
-    private int score = 0;
+    private int currentGamePoseIndex = -1;
+    private List<int> matchedPoseNumbers = new List<int>();
     private bool isPoseMatched = false;
     
-    // ポーズ管理
-    private List<int> availablePoses = new List<int>();
+    private string lastReceivedData = "";
+    private float lastReceiveTime = 0f;
+    private int totalMatchCount = 0;
+    private int totalMismatchCount = 0;
+    
+    // スレッド間通信用のキュー
+    private Queue<string> messageQueue = new Queue<string>();
+    private object queueLock = new object();
     
     [System.Serializable]
     public class PoseMatchMessage
@@ -65,63 +58,52 @@ public class PoseMatchValidator : MonoBehaviour
     
     void Start()
     {
-        InitializePoseList();
-        SelectNewPose();
+        if (danceGameManager == null)
+        {
+            danceGameManager = FindFirstObjectByType<DanceGameManager>();
+            if (danceGameManager == null)
+            {
+                Debug.LogWarning("DanceGameManagerが見つかりません。");
+            }
+        }
+        
+        if (playerManager == null)
+        {
+            playerManager = FindFirstObjectByType<PlayerManager>();
+            if (playerManager == null)
+            {
+                Debug.LogWarning("PlayerManagerが見つかりません。");
+            }
+            else
+            {
+                // Pythonからの制御を有効化
+                playerManager.usePythonControl = true;
+                Debug.Log("PlayerManager: Pythonからの制御を有効化");
+            }
+        }
+        else
+        {
+            // 手動で設定されている場合も有効化
+            playerManager.usePythonControl = true;
+            Debug.Log("PlayerManager: Pythonからの制御を有効化");
+        }
+        
         StartUDPReceiver();
-        lastPoseChangeTime = Time.time;
+        Debug.Log("PoseMatchValidator 開始");
     }
     
     void OnDestroy()
     {
         StopUDPReceiver();
-    }
-    
-    /// <summary>
-    /// 利用可能なポーズリストを初期化
-    /// </summary>
-    void InitializePoseList()
-    {
-        availablePoses.Clear();
-        for (int i = 1; i <= totalPoseCount; i++)
+        
+        // Python制御を無効化してキーボード制御に戻す
+        if (playerManager != null)
         {
-            availablePoses.Add(i);
-        }
-        Debug.Log($"ポーズリストを初期化しました。総数: {totalPoseCount}");
-    }
-    
-    /// <summary>
-    /// 新しいポーズをランダムに選択
-    /// </summary>
-    void SelectNewPose()
-    {
-        if (availablePoses.Count == 0)
-        {
-            Debug.Log("全ポーズをクリア!リセットします。");
-            InitializePoseList();
-        }
-        
-        int randomIndex = Random.Range(0, availablePoses.Count);
-        currentTargetPoseNumber = availablePoses[randomIndex];
-        availablePoses.RemoveAt(randomIndex);
-        
-        isPoseMatched = false;
-        lastPoseChangeTime = Time.time;
-        
-        Debug.Log($"新しいポーズを選択: #{currentTargetPoseNumber} (残り: {availablePoses.Count})");
-        
-        // UI更新
-        UpdateUI();
-        
-        // 参考画像を表示
-        if (poseReferenceImage != null && poseReferenceSprites != null && poseReferenceSprites.Length >= currentTargetPoseNumber)
-        {
-            poseReferenceImage.sprite = poseReferenceSprites[currentTargetPoseNumber - 1];
+            playerManager.usePythonControl = false;
+            Debug.Log("PlayerManager: キーボード制御に戻しました");
         }
     }
     
-    /// <summary>
-    /// UDP受信を開始
-    /// </summary>
     void StartUDPReceiver()
     {
         try
@@ -133,17 +115,14 @@ public class PoseMatchValidator : MonoBehaviour
             receiveThread.IsBackground = true;
             receiveThread.Start();
             
-            Debug.Log($"UDP受信を開始しました (Port: {receivePort})");
+            Debug.Log($"UDP受信開始 (Port: {receivePort})");
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"UDP受信の開始に失敗: {e.Message}");
+            Debug.LogError($"UDP受信失敗: {e.Message}");
         }
     }
     
-    /// <summary>
-    /// UDP受信を停止
-    /// </summary>
     void StopUDPReceiver()
     {
         isRunning = false;
@@ -158,12 +137,9 @@ public class PoseMatchValidator : MonoBehaviour
             udpClient.Close();
         }
         
-        Debug.Log("UDP受信を停止しました");
+        Debug.Log("UDP受信停止");
     }
     
-    /// <summary>
-    /// UDP受信スレッド
-    /// </summary>
     void ReceiveData()
     {
         while (isRunning)
@@ -174,22 +150,26 @@ public class PoseMatchValidator : MonoBehaviour
                 byte[] data = udpClient.Receive(ref remoteEP);
                 string jsonMessage = Encoding.UTF8.GetString(data);
                 
-                // メインスレッドで処理
-                UnityMainThreadDispatcher.Instance().Enqueue(() => ProcessReceivedMessage(jsonMessage));
+                // メインスレッドで処理するためキューに追加
+                lock (queueLock)
+                {
+                    messageQueue.Enqueue(jsonMessage);
+                }
             }
             catch (System.Exception e)
             {
                 if (isRunning)
                 {
-                    Debug.LogError($"UDP受信エラー: {e.Message}");
+                    // エラーメッセージもキューに追加（特殊なマーカー付き）
+                    lock (queueLock)
+                    {
+                        messageQueue.Enqueue($"ERROR:{e.Message}");
+                    }
                 }
             }
         }
     }
     
-    /// <summary>
-    /// 受信したメッセージを処理
-    /// </summary>
     void ProcessReceivedMessage(string jsonMessage)
     {
         try
@@ -198,7 +178,9 @@ public class PoseMatchValidator : MonoBehaviour
             
             if (message.type == "pose_matches")
             {
-                // 合致しているポーズ番号のリストを更新
+                lastReceivedData = jsonMessage;
+                lastReceiveTime = Time.time;
+                
                 matchedPoseNumbers.Clear();
                 if (message.matched_poses != null)
                 {
@@ -208,23 +190,7 @@ public class PoseMatchValidator : MonoBehaviour
                     }
                 }
                 
-                // 現在のターゲットポーズと合致しているか検証
-                bool isCurrentPoseMatched = matchedPoseNumbers.Contains(currentTargetPoseNumber);
-                
-                if (isCurrentPoseMatched && !isPoseMatched)
-                {
-                    // ポーズが合致した!
-                    OnPoseMatched();
-                }
-                else if (!isCurrentPoseMatched && isPoseMatched)
-                {
-                    // ポーズが崩れた
-                    isPoseMatched = false;
-                    Debug.Log("ポーズが崩れました");
-                }
-                
-                // UI更新
-                UpdateUI();
+                CheckPoseMatch();
             }
         }
         catch (System.Exception e)
@@ -233,150 +199,174 @@ public class PoseMatchValidator : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// ポーズが合致したときの処理
-    /// </summary>
-    void OnPoseMatched()
+    void CheckPoseMatch()
     {
-        isPoseMatched = true;
-        score += 100;
-        
-        Debug.Log($"ポーズ #{currentTargetPoseNumber} 成功! スコア: {score}");
-        
-        // 効果音やエフェクトを再生する処理をここに追加
-        
-        // 次のポーズへ
-        if (autoChangepose)
+        if (playerManager == null || danceGameManager == null)
         {
-            Invoke("SelectNewPose", 1.0f);  // 1秒後に次のポーズ
-        }
-    }
-    
-    /// <summary>
-    /// UI更新
-    /// </summary>
-    void UpdateUI()
-    {
-        if (currentPoseText != null)
-        {
-            currentPoseText.text = $"Target Pose: #{currentTargetPoseNumber}";
+            return;
         }
         
-        if (matchedPosesText != null)
+        bool wasMatched = isPoseMatched;
+        isPoseMatched = false;
+        
+        // ゲーム内で現在表示されているポーズ番号を取得(1始まり)
+        int currentGamePoseNumber = danceGameManager.CurrentPoseNumber;
+        
+        // Pythonから送られてきたポーズ番号リストと照合
+        if (matchedPoseNumbers.Contains(currentGamePoseNumber))
         {
-            if (matchedPoseNumbers.Count > 0)
+            // ゲーム内のポーズとPythonの検出が一致している
+            isPoseMatched = true;
+            playerManager.posetrue = true;
+            
+            if (!wasMatched)
             {
-                string matchedList = string.Join(", ", matchedPoseNumbers.Select(p => $"#{p}"));
-                matchedPosesText.text = $"Matched: {matchedList}";
-                matchedPosesText.color = matchedPoseNumbers.Contains(currentTargetPoseNumber) ? Color.green : Color.yellow;
-            }
-            else
-            {
-                matchedPosesText.text = "Matched: None";
-                matchedPosesText.color = Color.red;
+                totalMatchCount++;
+                string poses = string.Join(", ", matchedPoseNumbers.Select(p => $"#{p}"));
+                Debug.Log($"<color=green>✓ ポーズ一致！ゲーム: #{currentGamePoseNumber}, 検出: {poses}</color>");
             }
         }
-        
-        if (statusText != null)
+        else
         {
-            if (isPoseMatched)
+            // ポーズが一致していない
+            playerManager.posetrue = false;
+            
+            if (wasMatched)
             {
-                statusText.text = "SUCCESS!";
-                statusText.color = Color.green;
+                totalMismatchCount++;
+                if (matchedPoseNumbers.Count > 0)
+                {
+                    string poses = string.Join(", ", matchedPoseNumbers.Select(p => $"#{p}"));
+                    Debug.Log($"<color=yellow>✗ ポーズ不一致 ゲーム: #{currentGamePoseNumber}, 検出: {poses}</color>");
+                }
+                else
+                {
+                    Debug.Log($"<color=red>✗ ポーズ未検出 ゲーム: #{currentGamePoseNumber}</color>");
+                }
             }
-            else if (matchedPoseNumbers.Count > 0)
-            {
-                statusText.text = "DIFFERENT POSE";
-                statusText.color = Color.yellow;
-            }
-            else
-            {
-                statusText.text = "NO MATCH";
-                statusText.color = Color.red;
-            }
-        }
-        
-        if (scoreText != null)
-        {
-            scoreText.text = $"Score: {score}";
         }
     }
     
     void Update()
     {
-        // タイムアウトで自動的に次のポーズへ(オプション)
-        if (autoChangepose && !isPoseMatched && Time.time - lastPoseChangeTime > poseDuration)
+        // キューからメッセージを取得して処理
+        lock (queueLock)
         {
-            Debug.Log("タイムアウト。次のポーズへ");
-            SelectNewPose();
+            while (messageQueue.Count > 0)
+            {
+                string message = messageQueue.Dequeue();
+                
+                if (message.StartsWith("ERROR:"))
+                {
+                    Debug.LogError($"UDP受信エラー: {message.Substring(6)}");
+                }
+                else
+                {
+                    ProcessReceivedMessage(message);
+                }
+            }
         }
         
-        // デバッグ用: Spaceキーで手動で次のポーズへ
-        if (Input.GetKeyDown(KeyCode.Space))
+        // キーボード操作 - デバッグ情報表示
+        if (Input.GetKeyDown(KeyCode.I))
         {
-            SelectNewPose();
-        }
-        
-        // デバッグ用: Rキーでリセット
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            score = 0;
-            InitializePoseList();
-            SelectNewPose();
+            Debug.Log("=== PoseMatchValidator ===");
+            Debug.Log($"UDP: {isRunning}, Port: {receivePort}");
+            if (danceGameManager != null)
+            {
+                Debug.Log($"ゲーム内ポーズ: #{danceGameManager.CurrentPoseNumber}");
+            }
+            Debug.Log($"検出ポーズ: {string.Join(", ", matchedPoseNumbers.Select(p => $"#{p}"))}");
+            Debug.Log($"マッチ: {totalMatchCount}, ミスマッチ: {totalMismatchCount}");
+            if (playerManager != null)
+            {
+                Debug.Log($"PlayerManager.posetrue: {playerManager.posetrue}");
+            }
         }
     }
     
     void OnGUI()
     {
-        // デバッグ情報表示
-        GUILayout.BeginArea(new Rect(10, 10, 400, 300));
-        GUILayout.Label($"<b>Pose Match Validator</b>", new GUIStyle(GUI.skin.label) { fontSize = 16, richText = true });
-        GUILayout.Label($"Target Pose: #{currentTargetPoseNumber}");
-        GUILayout.Label($"Matched Poses: {string.Join(", ", matchedPoseNumbers.Select(p => $"#{p}"))}");
-        GUILayout.Label($"Status: {(isPoseMatched ? "<color=green>MATCHED!</color>" : "<color=red>NOT MATCHED</color>")}", new GUIStyle(GUI.skin.label) { richText = true });
-        GUILayout.Label($"Score: {score}");
-        GUILayout.Label($"Remaining Poses: {availablePoses.Count}");
+        if (!enableDebugGUI) return;
+        
+        GUILayout.BeginArea(new Rect(10, 10, 500, 500));
+        
+        GUIStyle titleStyle = new GUIStyle(GUI.skin.label) { fontSize = 16, fontStyle = FontStyle.Bold, richText = true };
+        GUIStyle normalStyle = new GUIStyle(GUI.skin.label) { fontSize = 14, richText = true };
+        
+        GUILayout.Label("<b><color=cyan>Pose Match Validator</color></b>", titleStyle);
         GUILayout.Space(10);
-        GUILayout.Label("[Space] Next Pose  [R] Reset");
+        
+        string udpStatus = isRunning ? "<color=green>受信中</color>" : "<color=red>停止</color>";
+        GUILayout.Label($"UDP状態: {udpStatus} (Port: {receivePort})", normalStyle);
+        
+        if (Time.time - lastReceiveTime < 5f)
+        {
+            GUILayout.Label($"<color=green>最終受信: {Time.time - lastReceiveTime:F2}秒前</color>", normalStyle);
+        }
+        else if (lastReceiveTime > 0)
+        {
+            GUILayout.Label($"<color=yellow>最終受信: {Time.time - lastReceiveTime:F1}秒前</color>", normalStyle);
+        }
+        else
+        {
+            GUILayout.Label("<color=red>データ未受信</color>", normalStyle);
+        }
+        
+        GUILayout.Space(10);
+        
+        if (matchedPoseNumbers.Count > 0)
+        {
+            string poseList = string.Join(", ", matchedPoseNumbers.Select(p => $"#{p}"));
+            GUILayout.Label($"<color=lime>検出ポーズ: {poseList}</color>", normalStyle);
+        }
+        else
+        {
+            GUILayout.Label("<color=red>検出ポーズ: なし</color>", normalStyle);
+        }
+        
+        GUILayout.Space(10);
+        
+        GUILayout.Label($"マッチ回数: <color=green>{totalMatchCount}</color>", normalStyle);
+        GUILayout.Label($"ミスマッチ回数: <color=red>{totalMismatchCount}</color>", normalStyle);
+        
+        GUILayout.Space(10);
+        
+        if (danceGameManager != null)
+        {
+            GUILayout.Label("<color=green> DanceGameManager</color>", normalStyle);
+        }
+        else
+        {
+            GUILayout.Label("<color=red> DanceGameManager</color>", normalStyle);
+        }
+        
+        if (playerManager != null)
+        {
+            string playerStatus = playerManager.posetrue ? "<color=green>TRUE</color>" : "<color=red>FALSE</color>";
+            GUILayout.Label($"<color=green> PlayerManager</color> (posetrue: {playerStatus})", normalStyle);
+        }
+        else
+        {
+            GUILayout.Label("<color=red> PlayerManager</color>", normalStyle);
+        }
+        
+        GUILayout.Space(10);
+        
+        // 現在のゲーム内ポーズ番号を表示
+        if (danceGameManager != null)
+        {
+            GUILayout.Label($"<color=cyan>ゲーム内ポーズ: #{danceGameManager.CurrentPoseNumber}</color>", normalStyle);
+        }
+        
+        GUILayout.Space(10);
+        
+        GUILayout.Label("<color=lime>自動判定反映: 常時ON</color>", normalStyle);
+        
+        GUILayout.Space(10);
+        
+        GUILayout.Label("<color=white>[I] 詳細情報</color>", normalStyle);
+        
         GUILayout.EndArea();
-    }
-}
-
-/// <summary>
-/// メインスレッドでアクションを実行するためのディスパッチャー
-/// </summary>
-public class UnityMainThreadDispatcher : MonoBehaviour
-{
-    private static UnityMainThreadDispatcher instance;
-    private Queue<System.Action> actions = new Queue<System.Action>();
-    
-    public static UnityMainThreadDispatcher Instance()
-    {
-        if (instance == null)
-        {
-            GameObject go = new GameObject("UnityMainThreadDispatcher");
-            instance = go.AddComponent<UnityMainThreadDispatcher>();
-            DontDestroyOnLoad(go);
-        }
-        return instance;
-    }
-    
-    public void Enqueue(System.Action action)
-    {
-        lock (actions)
-        {
-            actions.Enqueue(action);
-        }
-    }
-    
-    void Update()
-    {
-        lock (actions)
-        {
-            while (actions.Count > 0)
-            {
-                actions.Dequeue()?.Invoke();
-            }
-        }
     }
 }
