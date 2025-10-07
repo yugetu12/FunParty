@@ -19,6 +19,7 @@ public class PoseMatchValidator : MonoBehaviour
     [Header("ゲーム連携")]
     [SerializeField] private DanceGameManager danceGameManager;
     [SerializeField] private PlayerManager playerManager;
+    [SerializeField] private DanceGameStay danceGameStay;
     
     [Header("デバッグ設定")]
     [SerializeField] private bool enableDebugGUI = true;
@@ -86,6 +87,15 @@ public class PoseMatchValidator : MonoBehaviour
             // 手動で設定されている場合も有効化
             playerManager.usePythonControl = true;
             Debug.Log("PlayerManager: Pythonからの制御を有効化");
+        }
+        
+        if (danceGameStay == null)
+        {
+            danceGameStay = FindFirstObjectByType<DanceGameStay>();
+            if (danceGameStay == null)
+            {
+                Debug.LogWarning("DanceGameStayが見つかりません。");
+            }
         }
         
         StartUDPReceiver();
@@ -188,6 +198,17 @@ public class PoseMatchValidator : MonoBehaviour
                     {
                         matchedPoseNumbers.Add(match.pose_number);
                     }
+                }
+                
+                // ポーズ番号21が含まれている場合、DanceGameStayのsetupTrueをTrueにする
+                if (danceGameStay != null && matchedPoseNumbers.Contains(21))
+                {
+                    danceGameStay.setupTrue = true;
+                    Debug.Log("<color=cyan>ポーズ21検出 -> DanceGameStay.setupTrue = True</color>");
+                }
+                else if (danceGameStay != null)
+                {
+                    danceGameStay.setupTrue = false;
                 }
                 
                 CheckPoseMatch();

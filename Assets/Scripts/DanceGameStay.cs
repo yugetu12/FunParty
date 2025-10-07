@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 public class DanceGameStay : MonoBehaviour
 {
     public float holdTime = 0f;//秒数カウント
-    public float requiredTime = 10f;//目標秒数
+    public float requiredTime = 3f;//目標秒数
     public bool setupTrue = false;//Ｔポーズがあっているかどうか判別、こうちゃんからくる正誤判定いれる？
     public bool danceTime = false;//目標の秒数がたったか判別
 
@@ -16,7 +16,7 @@ public class DanceGameStay : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Tpose();//tが押されたsetupTrueで判別、本番は消す
+        //Tpose();//tが押されたsetupTrueで判別、本番は消す
         SetupPose();//setupTrueの時秒数加算、話されたら引く
 
         if (holdTime >= requiredTime)
@@ -31,7 +31,7 @@ public class DanceGameStay : MonoBehaviour
 
 
     }
-        
+
 
     public void SetupPose()
     {
@@ -46,15 +46,15 @@ public class DanceGameStay : MonoBehaviour
         }
     }
 
-    public void Tpose()
-    {
-        if (Input.GetKey(KeyCode.T))
-        {
-            setupTrue = true;
-        }
-        else
-        {
-            setupTrue = false;
-        }
-    }
+    //public void Tpose()
+    //{
+    //    if (Input.GetKey(KeyCode.T))
+    //    {
+    //        setupTrue = true;
+    //    }
+    //    else
+    //    {
+    //        setupTrue = false;
+    //    }
+    //}
 }
