@@ -1256,7 +1256,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scene: {fileID: 1813994954}
   hp: {fileID: 1249198522}
-  timer: {fileID: 0}
+  timer: {fileID: 6652690430262171901}
   player: {fileID: 1249198521}
   fallingObjects:
   - {fileID: 1302545343594336805, guid: befab7dc8dfc1044bb5ccbf848550544, type: 3}

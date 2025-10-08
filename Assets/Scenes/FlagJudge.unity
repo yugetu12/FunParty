@@ -323,6 +323,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3079337036267576711}
     m_Modifications:
+    - target: {fileID: 4922585781646085204, guid: e6abc1f0de120ea46a5185e1d2949abc, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: e2e7ebdcc91f62548b48aa21aa9ab1da, type: 2}
     - target: {fileID: 7419944279051328258, guid: e6abc1f0de120ea46a5185e1d2949abc, type: 3}
       propertyPath: m_LocalPosition.x
       value: 16.58
@@ -586,6 +590,8 @@ GameObject:
   - component: {fileID: 764249083}
   - component: {fileID: 764249082}
   - component: {fileID: 764249081}
+  - component: {fileID: 764249086}
+  - component: {fileID: 764249085}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -715,6 +721,83 @@ Transform:
   - {fileID: 2070732604}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!114 &764249085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764249080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b9a305e18de0c04dbd257a21cd47087, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sharedProfile: {fileID: 11400000, guid: 9d90d1c4d7ed6cd4ca5c7a5934a811e6, type: 2}
+  isGlobal: 1
+  blendDistance: 0
+  weight: 1
+  priority: 0
+--- !u!114 &764249086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764249080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 948f4100a11a5c24981795d21301da5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  volumeTrigger: {fileID: 764249084}
+  volumeLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  stopNaNPropagation: 1
+  finalBlitToCameraTarget: 0
+  antialiasingMode: 0
+  temporalAntialiasing:
+    jitterSpread: 0.75
+    sharpness: 0.25
+    stationaryBlending: 0.95
+    motionBlending: 0.85
+  subpixelMorphologicalAntialiasing:
+    quality: 2
+  fastApproximateAntialiasing:
+    fastMode: 0
+    keepAlpha: 0
+  fog:
+    enabled: 1
+    excludeSkybox: 1
+  debugLayer:
+    lightMeter:
+      width: 512
+      height: 256
+      showCurves: 1
+    histogram:
+      width: 512
+      height: 256
+      channel: 3
+    waveform:
+      exposure: 0.12
+      height: 256
+    vectorscope:
+      size: 256
+      exposure: 0.12
+    overlaySettings:
+      linearDepth: 0
+      motionColorIntensity: 4
+      motionGridSize: 64
+      colorBlindnessType: 0
+      colorBlindnessStrength: 1
+  m_Resources: {fileID: 11400000, guid: d82512f9c8e5d4a4d938b575d47f88d4, type: 2}
+  m_ShowToolkit: 0
+  m_ShowCustomSorter: 0
+  breakBeforeColorGrading: 0
+  m_BeforeTransparentBundles: []
+  m_BeforeStackBundles: []
+  m_AfterStackBundles: []
 --- !u!1 &1112843289
 GameObject:
   m_ObjectHideFlags: 0
@@ -802,6 +885,7 @@ GameObject:
   - component: {fileID: 1247545820}
   - component: {fileID: 1247545826}
   - component: {fileID: 1247545827}
+  - component: {fileID: 1247545828}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -816,14 +900,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1247545819}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 40ded9e2d41d37741b54c76abb1ea95f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   localPort: 9999
   imageRenderer: {fileID: 1247545823}
-  showInUI: 1
+  showInUI: 0
   imageTexture: {fileID: 0}
 --- !u!114 &1247545821
 MonoBehaviour:
@@ -841,16 +925,35 @@ MonoBehaviour:
   isPoseSuccess: 0
   angleError: 0
   lastUpdateTime: 
+  currentPoseNumber: 0
+  successDuration: 0
+  requiredDuration: 2
   statusText: {fileID: 0}
   errorText: {fileID: 0}
   connectionText: {fileID: 0}
+  poseNumberText: {fileID: 0}
+  progressText: {fileID: 0}
   OnPoseSuccess:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnPoseFail:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
+  OnPoseComplete:
+    m_PersistentCalls:
+      m_Calls: []
+    m_CallsDirty: 1
+  OnPoseChange:
+    m_PersistentCalls:
+      m_Calls: []
+    m_CallsDirty: 1
   showDebugGUI: 1
+  isReceiving: 0
+  hasRecentData: 0
+  lastDataTime: 0
+  wasCompleted: 0
 --- !u!64 &1247545822
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -954,6 +1057,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   posetrue: 0
+  usePythonControl: 0
 --- !u!114 &1247545827
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -973,6 +1077,23 @@ MonoBehaviour:
   - {fileID: 160838075}
   robotFace: {fileID: 21300000, guid: 0b0ad64496e38274ab441f8328e413d7, type: 3}
   robotCrossed: {fileID: 21300000, guid: 708f7aa2f4575ee4dab09c991aae8dc8, type: 3}
+--- !u!114 &1247545828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1247545819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f84fa2d28729f9747a2207f66b90acc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  receivePort: 5006
+  danceGameManager: {fileID: 0}
+  playerManager: {fileID: 0}
+  danceGameStay: {fileID: 0}
+  enableDebugGUI: 0
 --- !u!1001 &1361060226
 PrefabInstance:
   m_ObjectHideFlags: 0

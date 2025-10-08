@@ -15,14 +15,19 @@ public class DanceGameManager : MonoBehaviour
     [SerializeField] private GameObject[] colorLights;
     private bool isPoseTrue;
     private Vector3 originPos;
+    private int currentPoseIndex = 0;  // 現在表示されているポーズのインデックス(0始まり)
+    
+    // 外部から現在のポーズ番号を取得するためのプロパティ(1始まりで返す)
+    public int CurrentPoseNumber => currentPoseIndex + 1;
 
     void Start()
     {
         //初期位置を保存
         originPos = arms.transform.position;
         //初期画像を与える
-        arms.GetComponent<ShowTexture2D>().ChangeTexture(poseTexture[0]);
-        monitor.GetComponent<ShowTexture2D>().ChangeTexture(poseTexture[0]);
+        currentPoseIndex = 0;
+        arms.GetComponent<ShowTexture2D>().ChangeTexture(poseTexture[currentPoseIndex]);
+        monitor.GetComponent<ShowTexture2D>().ChangeTexture(poseTexture[currentPoseIndex]);
     }
 
     void Update()
@@ -50,9 +55,9 @@ public class DanceGameManager : MonoBehaviour
         //位置を戻す
         arms.transform.position = originPos;
         //パネル変更
-        int index = Random.Range(0, poseTexture.Length);
-        arms.GetComponent<ShowTexture2D>().ChangeTexture(poseTexture[index]);
-        monitor.GetComponent<ShowTexture2D>().ChangeTexture(poseTexture[index]);
+        currentPoseIndex = Random.Range(0, poseTexture.Length);
+        arms.GetComponent<ShowTexture2D>().ChangeTexture(poseTexture[currentPoseIndex]);
+        monitor.GetComponent<ShowTexture2D>().ChangeTexture(poseTexture[currentPoseIndex]);
 
         //正誤判定
         if (player.posetrue)
