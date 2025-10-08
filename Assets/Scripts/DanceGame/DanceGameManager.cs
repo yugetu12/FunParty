@@ -55,7 +55,13 @@ public class DanceGameManager : MonoBehaviour
         //位置を戻す
         arms.transform.position = originPos;
         //パネル変更
-        currentPoseIndex = Random.Range(0, poseTexture.Length);
+        int randomIndex = Random.Range(0, poseTexture.Length);
+        if (randomIndex == currentPoseIndex)
+        {
+            randomIndex = (randomIndex + 1) % poseTexture.Length; // 同じポーズが選ばれた場合、次のポーズに変更
+        }
+        currentPoseIndex = randomIndex;
+        //ゴールサインの更新
         arms.GetComponent<ShowTexture2D>().ChangeTexture(poseTexture[currentPoseIndex]);
         monitor.GetComponent<ShowTexture2D>().ChangeTexture(poseTexture[currentPoseIndex]);
 

@@ -327,6 +327,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: e2e7ebdcc91f62548b48aa21aa9ab1da, type: 2}
+    - target: {fileID: 5586970772622407076, guid: e6abc1f0de120ea46a5185e1d2949abc, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -1
+      objectReference: {fileID: 0}
     - target: {fileID: 7419944279051328258, guid: e6abc1f0de120ea46a5185e1d2949abc, type: 3}
       propertyPath: m_LocalPosition.x
       value: 16.58
@@ -921,39 +925,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f92dc385c8fcec4fb615f440876bd54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  udpPort: 5006
-  isPoseSuccess: 0
-  angleError: 0
-  lastUpdateTime: 
-  currentPoseNumber: 0
-  successDuration: 0
-  requiredDuration: 2
-  statusText: {fileID: 0}
-  errorText: {fileID: 0}
-  connectionText: {fileID: 0}
-  poseNumberText: {fileID: 0}
-  progressText: {fileID: 0}
-  OnPoseSuccess:
-    m_PersistentCalls:
-      m_Calls: []
-    m_CallsDirty: 1
-  OnPoseFail:
-    m_PersistentCalls:
-      m_Calls: []
-    m_CallsDirty: 1
-  OnPoseComplete:
-    m_PersistentCalls:
-      m_Calls: []
-    m_CallsDirty: 1
-  OnPoseChange:
-    m_PersistentCalls:
-      m_Calls: []
-    m_CallsDirty: 1
-  showDebugGUI: 1
-  isReceiving: 0
-  hasRecentData: 0
-  lastDataTime: 0
-  wasCompleted: 0
 --- !u!64 &1247545822
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1093,7 +1064,7 @@ MonoBehaviour:
   danceGameManager: {fileID: 0}
   playerManager: {fileID: 0}
   danceGameStay: {fileID: 0}
-  enableDebugGUI: 0
+  enableDebugGUI: 1
 --- !u!1001 &1361060226
 PrefabInstance:
   m_ObjectHideFlags: 0
