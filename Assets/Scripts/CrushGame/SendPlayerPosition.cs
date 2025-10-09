@@ -21,7 +21,7 @@ public class SendPlayerPosition : MonoBehaviour
         {
             id[i] = latestData.persons[i].id;
             x[i] = (latestData.persons[i].x - 0.5f) * playerPosRange * 2;
-            y[i] = (latestData.persons[i].y - 0.5f) * playerPosRange * 2;
+            y[i] = (latestData.persons[i].y - 0.5f) * playerPosRange * -2.7f + 1.5f;
         }
     }
 }

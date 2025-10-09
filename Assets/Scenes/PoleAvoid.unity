@@ -1022,13 +1022,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1813994947}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b2d410d303324234abdb9a5700e2553f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   receiver: {fileID: 1813994951}
-  playerPosRange: 5
+  playerPosRange: 11
   latestData:
     timestamp: 0
     frame_width: 0
@@ -1044,7 +1044,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1813994947}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ded5a467cda886049853e47c1f0bc57c, type: 3}
   m_Name: 
@@ -1121,6 +1121,10 @@ PrefabInstance:
       propertyPath: sender
       value: 
       objectReference: {fileID: 1813994950}
+    - target: {fileID: 2923219650885196438, guid: 7ab99c13d709a804aa1c4fb133dcaa36, type: 3}
+      propertyPath: isAutoMove
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5862248992730312522, guid: 7ab99c13d709a804aa1c4fb133dcaa36, type: 3}
       propertyPath: m_Name
       value: Player
