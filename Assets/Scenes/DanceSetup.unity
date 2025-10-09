@@ -592,7 +592,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   holdTime: 0
-  requiredTime: 10
+  requiredTime: 3
   setupTrue: 0
   danceTime: 0
 --- !u!114 &1622963971
