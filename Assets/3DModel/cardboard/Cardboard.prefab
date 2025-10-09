@@ -51,7 +51,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 12beb5a8f42fccd46b9f5d9deb682555, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: ebbde76f066dc924d8f73d415a585a26, type: 2}
+      objectReference: {fileID: 2100000, guid: 2bd88c4f9f96ccf43a823a9fcadf1a60, type: 2}
     - target: {fileID: 919132149155446097, guid: 12beb5a8f42fccd46b9f5d9deb682555, type: 3}
       propertyPath: m_Name
       value: Cardboard
